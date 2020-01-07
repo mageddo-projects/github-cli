@@ -3,11 +3,11 @@
 set -e
 
 create_release(){
-  local USERNAME=$1
-  local REPOSITORY=$2
-  local APP_VERSION=$3
-  local CURRENT_BRANCH=$4
-  local DESC=$5
+  local USERNAME="$1"
+  local REPOSITORY="$2"
+  local APP_VERSION="$3"
+  local CURRENT_BRANCH="$4"
+  local DESC="$5"
   local PAYLOAD='{
     "tag_name": "%s",
     "target_commitish": "%s",
@@ -54,11 +54,11 @@ create_tag(){
 }
 
 #    REPO_TOKEN=$2
-USERNAME=$2
-REPOSITORY=$3
-APP_VERSION=$4
-CURRENT_BRANCH=$5
-DESC=$6
+USERNAME="$2"
+REPOSITORY="$3"
+APP_VERSION="$4"
+CURRENT_BRANCH="$5"
+DESC="$6"
 
 echo "> USERNAME=${USERNAME}, REPOSITORY=${REPOSITORY}, APP_VERSION=${APP_VERSION}, CURRENT_BRANCH=${CURRENT_BRANCH}, DESC=${DESC}"
 
