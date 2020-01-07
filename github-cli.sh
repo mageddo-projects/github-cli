@@ -6,7 +6,8 @@ create_release(){
   local USERNAME=$1
   local REPOSITORY=$2
   local APP_VERSION=$3
-  local DESC=$4
+  local CURRENT_BRANCH=$4
+  local DESC=$5
   local PAYLOAD='{
     "tag_name": "%s",
     "target_commitish": "%s",
@@ -15,10 +16,14 @@ create_release(){
     "draft": false,
     "prerelease": true
   }'
-  local PAYLOAD=$(printf "$PAYLOAD" $APP_VERSION $APP_VERSION $APP_VERSION "$DESC")
-  curl -i -s -X POST "https://api.github.com/repos/${USERNAME}/${REPOSITORY}/releases?access_token=$REPO_TOKEN" \
-    --data "$PAYLOAD"
-  local TAG_ID=$(echo "" | grep -o -E 'id": [0-9]+'| awk '{print $2}' | head -n 1)
+  local PAYLOAD=$(printf "$PAYLOAD" $APP_VERSION $CURRENT_BRANCH $APP_VERSION "$DESC")
+  (curl -s -X POST -w '%{stderr}%{http_code}\n%{stdout}\n' \
+    "https://api.github.com/repos/${USERNAME}/${REPOSITORY}/releases?access_token=$REPO_TOKEN" \
+    --data "$PAYLOAD" |\
+    tee -a /dev/stderr | jq -r '.id') 2> /tmp/stderr 1> /tmp/stdout
+
+  test $(cat /tmp/stderr | head -n 1) -eq 200
+  TAG_ID=$(cat /tmp/stdout)
   echo "> Release created with id $TAG_ID" >&2
   echo $TAG_ID
 }
@@ -50,8 +55,9 @@ USERNAME=$2
 REPOSITORY=$3
 APP_VERSION=$4
 CURRENT_BRANCH=$5
+DESC=$6
 
-echo "> USERNAME=${USERNAME}, REPOSITORY=${REPOSITORY}, APP_VERSION=${APP_VERSION}"
+echo "> USERNAME=${USERNAME}, REPOSITORY=${REPOSITORY}, APP_VERSION=${APP_VERSION}, CURRENT_BRANCH=${CURRENT_BRANCH}, DESC=${DESC}"
 
 case $1 in
 
@@ -61,7 +67,7 @@ case $1 in
 
     create_tag
 
-    create_release $USERNAME $REPOSITORY $APP_VERSION
+    create_release $USERNAME $REPOSITORY $APP_VERSION $CURRENT_BRANCH $DESC
 
   ;;
 
@@ -70,7 +76,7 @@ case $1 in
   ;;
 
   create-release )
-    create_release $USERNAME $REPOSITORY $APP_VERSION
+    create_release $USERNAME $REPOSITORY $APP_VERSION $CURRENT_BRANCH $DESC
   ;;
 
 esac
