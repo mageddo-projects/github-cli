@@ -36,7 +36,7 @@ create_tag(){
   git config user.email "builds@travis-ci.com"
   git config user.name "Travis CI"
 
-  git commit -a -m "Releasing ${APP_VERSION}"
+  git commit -a -m "Releasing ${APP_VERSION}" || true
   git tag ${APP_VERSION}
 
   REMOTE="https://${REPO_TOKEN}@github.com/${USERNAME}/${REPOSITORY}.git"
