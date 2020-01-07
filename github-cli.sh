@@ -40,7 +40,7 @@ create_tag(){
   git tag ${APP_VERSION}
 
   REMOTE="https://${REPO_TOKEN}@github.com/${USERNAME}/${REPOSITORY}.git"
-  git push "$REMOTE" "$CURRENT_BRANCH:$CURRENT_BRANCH" --tags
+  git push "$REMOTE" "$CURRENT_BRANCH" --tags
   git status
   echo "> Pushed"
 }
