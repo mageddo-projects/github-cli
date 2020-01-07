@@ -1,3 +1,9 @@
+Setup token
+
+```bash
+REPO_TOKEN=8094deb9fe1d7d15598a8e7b876e151810630635
+```
+
 ### Creating a tag
 ```bash
 ./github-cli.sh create-tag mageddo-projects github-cli v1.3 master
