@@ -13,7 +13,7 @@ create_release(){
   --arg body "$DESC" '{
     $tag_name,
     $target_commitish,
-    $tag_name,
+    name: $tag_name,
     $body,
     "draft": false,
     "prerelease": true
