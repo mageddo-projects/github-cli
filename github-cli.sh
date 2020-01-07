@@ -8,23 +8,24 @@ create_release(){
   local APP_VERSION="$3"
   local CURRENT_BRANCH="$4"
   local DESC="$5"
-  local PAYLOAD='{
-    "tag_name": "%s",
-    "target_commitish": "%s",
-    "name": "%s",
-    "body": "%s",
+  local PAYLOAD=$(echo '{}' | jq --arg tag_name "$APP_VERSION" \
+  --arg target_commitish "$CURRENT_BRANCH" \
+  --arg body "$DESC" '{
+    $tag_name,
+    $target_commitish,
+    $tag_name,
+    $body,
     "draft": false,
     "prerelease": true
-  }'
-  local PAYLOAD=$(printf "$PAYLOAD" $APP_VERSION $CURRENT_BRANCH $APP_VERSION "$DESC")
+  }')
   (curl -s -X POST -w '%{stderr}%{http_code}\n%{stdout}\n' \
     "https://api.github.com/repos/${USERNAME}/${REPOSITORY}/releases?access_token=$REPO_TOKEN" \
     --data "$PAYLOAD" |\
     tee -a /dev/stderr | jq -r '.id') 2> /tmp/stderr 1> /tmp/stdout
 
   if test "$(cat /tmp/stderr | head -n 1)" -ne "201"; then
-    echo -e "> Can't create release: \n $(cat /tmp/stderr)" >&2
-    exit 3
+    echo -e "> Can't create release: \nreq=${PAYLOAD}\n\nres=$(cat /tmp/stderr)" >&2
+    exit 10
   fi
   local RELEASE_ID=$(cat /tmp/stdout)
   echo "> Release created with id $RELEASE_ID" >&2
@@ -39,7 +40,7 @@ upload_file(){
 
   if test "$(echo "$OUT" | tail -n 1)" -ne "201"; then
     echo -e "> Can't upload file: $TARGET_FILE \n $(echo ${OUT})" >&2
-    exit 2
+    exit 11
   fi
 }
 
@@ -57,7 +58,7 @@ upload_files(){
 validate_repo_token(){
   if [ "$REPO_TOKEN" = "" ] ; then
     echo "REPO_TOKEN cannot be empty" >&2
-    exit 4;
+    exit 12;
   fi
 }
 
