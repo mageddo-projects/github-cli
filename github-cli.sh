@@ -32,9 +32,15 @@ create_release(){
 }
 
 upload_file(){
-  curl --data-binary "@$SOURCE_FILE" -i -w '\n' -s -X POST \
-    -H 'Content-Type: application/octet-stream' \
+  local OUT=$(curl --data-binary "@$SOURCE_FILE" -w "\n%{http_code}\n" \
+    -s -X POST -H 'Content-Type: application/octet-stream' \
     "https://uploads.github.com/repos/${USERNAME}/${REPOSITORY}/releases/$RELEASE_ID/assets?name=$TARGET_FILE&access_token=$REPO_TOKEN"
+    )
+
+  if test "$(echo "$OUT" | tail -n 1)" -ne "201"; then
+    echo -e "> Can't upload file: $TARGET_FILE \n $(echo ${OUT})"
+    exit 2
+  fi
 }
 
 upload_files(){
