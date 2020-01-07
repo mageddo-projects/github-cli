@@ -23,8 +23,8 @@ create_release(){
     tee -a /dev/stderr | jq -r '.id') 2> /tmp/stderr 1> /tmp/stdout
 
   if test "$(cat /tmp/stderr | head -n 1)" -ne "201"; then
-    echo -e "> Can't create release: \n $(cat /tmp/stderr)"
-    exit 1
+    echo -e "> Can't create release: \n $(cat /tmp/stderr)" >&2
+    exit 3
   fi
   local RELEASE_ID=$(cat /tmp/stdout)
   echo "> Release created with id $RELEASE_ID" >&2
@@ -38,7 +38,7 @@ upload_file(){
     )
 
   if test "$(echo "$OUT" | tail -n 1)" -ne "201"; then
-    echo -e "> Can't upload file: $TARGET_FILE \n $(echo ${OUT})"
+    echo -e "> Can't upload file: $TARGET_FILE \n $(echo ${OUT})" >&2
     exit 2
   fi
 }
@@ -47,7 +47,7 @@ upload_files(){
   for SOURCE_FILE in "$@"; do
     if [ -f "$SOURCE_FILE" ]; then
       TARGET_FILE="$(basename $SOURCE_FILE)"
-      echo "> uploading $TARGET_FILE"
+      echo "> uploading $TARGET_FILE"  >&2
       md5sum $SOURCE_FILE && ls -lha $SOURCE_FILE
       upload_file
     fi
@@ -55,7 +55,10 @@ upload_files(){
 }
 
 validate_repo_token(){
-  if [ "$REPO_TOKEN" = "" ] ; then echo "REPO_TOKEN cannot be empty"; exit 1; fi
+  if [ "$REPO_TOKEN" = "" ] ; then
+    echo "REPO_TOKEN cannot be empty" >&2
+    exit 4;
+  fi
 }
 
 create_tag(){
@@ -68,7 +71,7 @@ create_tag(){
   REMOTE="https://${REPO_TOKEN}@github.com/${USERNAME}/${REPOSITORY}.git"
   git push "$REMOTE" "$CURRENT_BRANCH" --tags
   git status
-  echo "> Pushed"
+  echo "> Pushed" >&2
 }
 
 USERNAME="$2"
@@ -77,7 +80,7 @@ APP_VERSION="$4"
 CURRENT_BRANCH="$5"
 DESC="$6"
 
-echo "> USERNAME=${USERNAME}, REPOSITORY=${REPOSITORY}, APP_VERSION=${APP_VERSION}, CURRENT_BRANCH=${CURRENT_BRANCH}, DESC=${DESC}"
+echo "> USERNAME=${USERNAME}, REPOSITORY=${REPOSITORY}, APP_VERSION=${APP_VERSION}, CURRENT_BRANCH=${CURRENT_BRANCH}, DESC=${DESC}" >&2
 
 case $1 in
 
