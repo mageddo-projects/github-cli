@@ -22,7 +22,10 @@ create_release(){
     --data "$PAYLOAD" |\
     tee -a /dev/stderr | jq -r '.id') 2> /tmp/stderr 1> /tmp/stdout
 
-  test $(cat /tmp/stderr | head -n 1) -eq 200
+  if test "$(cat /tmp/stderr | head -n 1)" -ne "201"; then
+    echo -e "> Can't create release: \n $(cat /tmp/stderr)"
+    exit 1
+  fi
   TAG_ID=$(cat /tmp/stdout)
   echo "> Release created with id $TAG_ID" >&2
   echo $TAG_ID
