@@ -70,7 +70,7 @@ case $1 in
 
     create_tag
 
-    create_release $USERNAME $REPOSITORY $APP_VERSION $CURRENT_BRANCH $DESC
+    create_release $USERNAME $REPOSITORY $APP_VERSION $CURRENT_BRANCH "$DESC"
 
   ;;
 
@@ -79,7 +79,7 @@ case $1 in
   ;;
 
   create-release )
-    create_release $USERNAME $REPOSITORY $APP_VERSION $CURRENT_BRANCH $DESC
+    create_release $USERNAME $REPOSITORY $APP_VERSION $CURRENT_BRANCH "$DESC"
   ;;
 
 esac
