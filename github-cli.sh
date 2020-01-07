@@ -45,7 +45,7 @@ upload_file(){
 
 upload_files(){
   for SOURCE_FILE in "$@"; do
-    if [ -f $SOURCE_FILE ]; then
+    if [ -f "$SOURCE_FILE" ]; then
       TARGET_FILE="$(basename $SOURCE_FILE)"
       echo "> uploading $TARGET_FILE"
       md5sum $SOURCE_FILE && ls -lha $SOURCE_FILE
