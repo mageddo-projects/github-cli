@@ -26,14 +26,26 @@ create_release(){
     echo -e "> Can't create release: \n $(cat /tmp/stderr)"
     exit 1
   fi
-  TAG_ID=$(cat /tmp/stdout)
-  echo "> Release created with id $TAG_ID" >&2
-  echo $TAG_ID
+  local RELEASE_ID=$(cat /tmp/stdout)
+  echo "> Release created with id $RELEASE_ID" >&2
+  echo $RELEASE_ID
 }
 
 upload_file(){
-  curl --data-binary "@$SOURCE_FILE" -i -w '\n' -f -s -X POST -H 'Content-Type: application/octet-stream' \
-  "https://uploads.github.com/repos/$REPO_URL/releases/$TAG_ID/assets?name=$TARGET_FILE&access_token=$REPO_TOKEN"
+  curl --data-binary "@$SOURCE_FILE" -i -w '\n' -s -X POST \
+    -H 'Content-Type: application/octet-stream' \
+    "https://uploads.github.com/repos/${USERNAME}/${REPOSITORY}/releases/$RELEASE_ID/assets?name=$TARGET_FILE&access_token=$REPO_TOKEN"
+}
+
+upload_files(){
+  for SOURCE_FILE in "$@"; do
+    if [ -f $SOURCE_FILE ]; then
+      TARGET_FILE="$(basename $SOURCE_FILE)"
+      echo "> uploading $TARGET_FILE"
+      md5sum $SOURCE_FILE && ls -lha $SOURCE_FILE
+      upload_file
+    fi
+  done
 }
 
 validate_repo_token(){
@@ -53,7 +65,6 @@ create_tag(){
   echo "> Pushed"
 }
 
-#    REPO_TOKEN=$2
 USERNAME="$2"
 REPOSITORY="$3"
 APP_VERSION="$4"
@@ -70,7 +81,9 @@ case $1 in
 
     create_tag
 
-    create_release $USERNAME $REPOSITORY $APP_VERSION $CURRENT_BRANCH "$DESC"
+    RELEASE_ID=$(create_release $USERNAME $REPOSITORY $APP_VERSION $CURRENT_BRANCH "$DESC")
+
+    upload_files "$@"
 
   ;;
 
@@ -80,6 +93,11 @@ case $1 in
 
   create-release )
     create_release $USERNAME $REPOSITORY $APP_VERSION $CURRENT_BRANCH "$DESC"
+  ;;
+
+  upload-files )
+    RELEASE_ID="$4"
+    upload_files "$@"
   ;;
 
 esac
