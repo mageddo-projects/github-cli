@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 create_release(){
   local USERNAME=$1
   local REPOSITORY=$2
@@ -14,10 +16,9 @@ create_release(){
     "prerelease": true
   }'
   local PAYLOAD=$(printf "$PAYLOAD" $APP_VERSION $APP_VERSION $APP_VERSION "$DESC")
-  local TAG_ID=$(\
-    curl -i -s -f -X POST "https://api.github.com/repos/${USERNAME}/${REPOSITORY}/releases?access_token=$REPO_TOKEN" \
-    --data "$PAYLOAD" | grep -o -E 'id": [0-9]+'| awk '{print $2}' | head -n 1 \
-  )
+  curl -i -s -X POST "https://api.github.com/repos/${USERNAME}/${REPOSITORY}/releases?access_token=$REPO_TOKEN" \
+    --data "$PAYLOAD"
+  local TAG_ID=$(echo "" | grep -o -E 'id": [0-9]+'| awk '{print $2}' | head -n 1)
   echo "> Release created with id $TAG_ID" >&2
   echo $TAG_ID
 }
@@ -32,9 +33,14 @@ validate_repo_token(){
 }
 
 create_tag(){
+  git config user.email "builds@travis-ci.com"
+  git config user.name "Travis CI"
+
+  git commit -a -m "Releasing ${APP_VERSION}"
+  git tag ${APP_VERSION}
+
   REMOTE="https://${REPO_TOKEN}@github.com/${USERNAME}/${REPOSITORY}.git"
-  git tag ${APP_VERSION} -a -m "Releasing ${APP_VERSION}"
-  git push "$REMOTE" --tags
+  git push "$REMOTE" "$CURRENT_BRANCH:$CURRENT_BRANCH" --tags
   git status
   echo "> Pushed"
 }
@@ -43,13 +49,13 @@ create_tag(){
 USERNAME=$2
 REPOSITORY=$3
 APP_VERSION=$4
+CURRENT_BRANCH=$5
 
 echo "> USERNAME=${USERNAME}, REPOSITORY=${REPOSITORY}, APP_VERSION=${APP_VERSION}"
 
 case $1 in
 
   release )
-
 
     validate_repo_token
 
@@ -58,6 +64,11 @@ case $1 in
     create_release $USERNAME $REPOSITORY $APP_VERSION
 
   ;;
+
+  create-tag )
+    create_tag
+  ;;
+
   create-release )
     create_release $USERNAME $REPOSITORY $APP_VERSION
   ;;
