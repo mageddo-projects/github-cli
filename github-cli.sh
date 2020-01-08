@@ -17,7 +17,7 @@ create_release(){
     $body,
     "draft": false,
     "prerelease": true
-  }')
+  }' | sed -r 's/[\]{2}/\\/g')
   (curl -s -X POST -w '%{stderr}%{http_code}\n%{stdout}\n' \
     "https://api.github.com/repos/${USERNAME}/${REPOSITORY}/releases?access_token=$REPO_TOKEN" \
     --data "$PAYLOAD" |\
