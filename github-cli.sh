@@ -69,10 +69,11 @@ create_tag(){
   git commit -a -m "Releasing ${APP_VERSION}" || true
   git tag ${APP_VERSION}
 
-  REMOTE="https://${REPO_TOKEN}@github.com/${USERNAME}/${REPOSITORY}.git"
-  git push "$REMOTE" "$CURRENT_BRANCH" --tags
+  local REMOTE="https://${REPO_TOKEN}@github.com/${USERNAME}/${REPOSITORY}.git"
+  local LAST_COMMIT=$(git log --oneline | awk '{print $1}' | head -n1)
+  git push "$REMOTE" "$LAST_COMMIT:$CURRENT_BRANCH" --tags
   git status
-  echo "> Pushed" >&2
+  echo "> Pushed ${LAST_COMMIT} to ${CURRENT_BRANCH}" >&2
 }
 
 USERNAME="$2"
