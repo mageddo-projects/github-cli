@@ -1,3 +1,4 @@
+## Using IT
 Setup token
 
 ```bash
@@ -24,4 +25,12 @@ REPO_TOKEN=8094deb9fe1d7d15598a8e7b876e151810630635
 
 ```bash
 ./github-cli.sh release mageddo-projects github-cli v1.0 master "some description" tmp.zip
+```
+
+## Contributing
+
+### Generating a release 
+
+```
+/github-cli.sh release mageddo-projects github-cli v1.5 master "some description" github-cli.sh
 ```
