@@ -19,7 +19,7 @@ create_release(){
     "prerelease": true
   }' | sed -r 's/[\]{2}/\\/g')
   (curl -s -X POST -w '%{stderr}%{http_code}\n%{stdout}\n' \
-      -H "Authorization: token $${REPO_TOKEN}" \
+      -H "Authorization: token ${REPO_TOKEN}" \
     "https://api.github.com/repos/${USERNAME}/${REPOSITORY}/releases?access_token=$REPO_TOKEN" \
     --data "$PAYLOAD" |\
     tee -a /dev/stderr | jq -r '.id') 2> /tmp/stderr 1> /tmp/stdout
@@ -36,7 +36,7 @@ create_release(){
 upload_file(){
   local OUT=$(curl --data-binary "@$SOURCE_FILE" -w "\n%{http_code}\n" \
     -s -X POST -H 'Content-Type: application/octet-stream' \
-    -H "Authorization: token $${REPO_TOKEN}" \
+    -H "Authorization: token ${REPO_TOKEN}" \
     "https://uploads.github.com/repos/${USERNAME}/${REPOSITORY}/releases/$RELEASE_ID/assets?name=$TARGET_FILE"
     )
 
