@@ -34,7 +34,7 @@ create_release(){
 }
 
 upload_file(){
-  local OUT=$(curl --data-binary "@$SOURCE_FILE" -w "\n%{http_code}\n" \
+  local OUT=$(curl --data-binary "@$SOURCE_FILE" -w "\n%{http_code}\n%{stdout}\n" \
     -s -X POST -H 'Content-Type: application/octet-stream' \
     -H "Authorization: token ${REPO_TOKEN}" \
     "https://uploads.github.com/repos/${USERNAME}/${REPOSITORY}/releases/$RELEASE_ID/assets?name=$TARGET_FILE"
