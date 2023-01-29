@@ -32,5 +32,5 @@ REPO_TOKEN=8094deb9fe1d7d15598a8e7b876e151810630635
 ### Generating a release 
 
 ```
-/github-cli.sh release mageddo-projects github-cli v1.5 master "some description" github-cli.sh
+./github-cli.sh release mageddo-projects github-cli v1.5 master "some description" github-cli.sh
 ```
