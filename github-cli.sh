@@ -68,12 +68,11 @@ create_tag(){
   git config user.email "githubcli@github.com"
   git config user.name "Github CLI"
 
-  git commit -a -m "Releasing ${APP_VERSION}" || true
   git tag ${APP_VERSION}
 
   local REMOTE="https://${REPO_TOKEN}@github.com/${USERNAME}/${REPOSITORY}.git"
   local LAST_COMMIT=$(git log --oneline | awk '{print $1}' | head -n1)
-  git push "$REMOTE" "$LAST_COMMIT:$CURRENT_BRANCH" --tags
+  git push "$REMOTE" --tags
   git status
   echo "> Pushed ${LAST_COMMIT} to ${CURRENT_BRANCH}" >&2
 }
