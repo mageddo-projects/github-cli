@@ -37,7 +37,7 @@ upload_file(){
   local OUT=$(curl --data-binary "@$SOURCE_FILE" -w "\n%{http_code}\n%{stdout}\n" \
     -s -X POST -H 'Content-Type: application/octet-stream' \
     -H "Authorization: token ${REPO_TOKEN}" \
-    "https://uplxxoads.github.com/repos/${USERNAME}/${REPOSITORY}/releases/$RELEASE_ID/assets?name=$TARGET_FILE"
+    "https://uploads.github.com/repos/${USERNAME}/${REPOSITORY}/releases/$RELEASE_ID/assets?name=$TARGET_FILE"
     )
 
   if test "$(echo "$OUT" | tail -n 1)" -ne "201"; then
