@@ -53,7 +53,7 @@ upload_files(){
       TARGET_FILE="$(basename $SOURCE_FILE)"
       echo "> uploading $TARGET_FILE"  >&2
       md5sum $SOURCE_FILE && ls -lha $SOURCE_FILE
-      upload_file || echo "try 2" && upload_file || echo "try 3" && upload_file
+      ( echo "try 1" && upload_file ) || ( echo "try 2" && upload_file ) || ( echo "try 3" && upload_file )
     fi
   done
 }
