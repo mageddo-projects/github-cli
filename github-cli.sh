@@ -37,13 +37,14 @@ upload_file(){
   local OUT=$(curl --data-binary "@$SOURCE_FILE" -w "\n%{http_code}\n%{stdout}\n" \
     -s -X POST -H 'Content-Type: application/octet-stream' \
     -H "Authorization: token ${REPO_TOKEN}" \
-    "https://uploads.github.com/repos/${USERNAME}/${REPOSITORY}/releases/$RELEASE_ID/assets?name=$TARGET_FILE"
+    "https://uplxxoads.github.com/repos/${USERNAME}/${REPOSITORY}/releases/$RELEASE_ID/assets?name=$TARGET_FILE"
     )
 
   if test "$(echo "$OUT" | tail -n 1)" -ne "201"; then
     echo -e "> Can't upload file: $TARGET_FILE \n $(echo ${OUT})" >&2
-    exit 11
+    return 11
   fi
+  return 0
 }
 
 upload_files(){
@@ -52,7 +53,7 @@ upload_files(){
       TARGET_FILE="$(basename $SOURCE_FILE)"
       echo "> uploading $TARGET_FILE"  >&2
       md5sum $SOURCE_FILE && ls -lha $SOURCE_FILE
-      upload_file
+      upload_file || echo "try 2" && upload_file || echo "try 3" && upload_file
     fi
   done
 }
