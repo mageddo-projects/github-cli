@@ -42,8 +42,9 @@ upload_file(){
 
   if test "$(echo "$OUT" | tail -n 1)" -ne "201"; then
     echo -e "> Can't upload file: $TARGET_FILE \n $(echo ${OUT})" >&2
-    exit 11
+    return 11
   fi
+  return 0
 }
 
 upload_files(){
@@ -52,7 +53,7 @@ upload_files(){
       TARGET_FILE="$(basename $SOURCE_FILE)"
       echo "> uploading $TARGET_FILE"  >&2
       md5sum $SOURCE_FILE && ls -lha $SOURCE_FILE
-      upload_file
+      upload_file || echo "try 2" && upload_file || echo "try 3" && upload_file
     fi
   done
 }
